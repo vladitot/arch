@@ -77,8 +77,18 @@ class YamlRenderPipeline
 
                 }
                 $this->putTestsFoldersIntoComposerJson(Memory::$modules);
+                $this->putMigrationCommandsToComposerJson(Memory::$modules);
             }
+    }
 
+    public function putMigrationCommandsToComposerJson(array $modules): void {
+        $composerJson = json_decode(file_get_contents(base_path().'/composer.json'), true);
+        $composerJson['scripts']['migrate'] = [];
+        foreach ($modules as $module) {
+            $composerJson['scripts']['migrate'][] = '@php artisan migrate --path=Packages/'.ucfirst($module->title).'/Migrations';
+        }
+
+        file_put_contents(base_path().'/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
     }
 
     /**
