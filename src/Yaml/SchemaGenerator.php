@@ -194,7 +194,7 @@ class SchemaGenerator
             $propertiesInSchema[$reflectionProperty->getName()] = [
                 'type'=>'object',
                 'description'=>$description,
-                'properties'=>$newObjectProperties
+                'properties'=>$newObjectProperties['properties']
             ];
             continue;
         }

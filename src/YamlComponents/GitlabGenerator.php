@@ -2,7 +2,7 @@
 
 namespace Vladitot\Architect\YamlComponents;
 
-use AbstractGenerator;
+use Vladitot\Architect\AbstractGenerator;
 use Vladitot\Architect\Yaml\Module;
 use App\Models\GitlabChart;
 use App\Models\GitlabChartDictionary;

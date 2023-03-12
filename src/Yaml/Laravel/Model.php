@@ -7,7 +7,7 @@ use Spatie\LaravelData\Data;
 class Model extends Data
 {
     public string $title;
-    public ?string $comment;
+    public ?string $comment = '';
     public bool $generate_migration;
 
     /**

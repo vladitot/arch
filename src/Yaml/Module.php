@@ -11,7 +11,7 @@ use Spatie\LaravelData\Data;
 
 class Module extends Data
 {
-    public string $title;
+    public string $title = '';
     /**
      * @var array|Model[] $models;
      */

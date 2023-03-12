@@ -10,8 +10,7 @@ class AggregatorMethod  extends Data
     public string $comment;
 
 
-    /** @var ControllerMethodFields $controller_fields */
-    public ControllerMethodFields $controller_fields;
+    public ?ControllerMethodFields $controller_fields = null;
 
     /**
      * @var array|InputParam[] $inputParams;

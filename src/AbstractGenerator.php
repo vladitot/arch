@@ -1,6 +1,8 @@
 <?php
 
+namespace Vladitot\Architect;
 
+use OpenAI;
 use Vladitot\Architect\Yaml\Laravel\AggregatorMethod;
 use Vladitot\Architect\Yaml\Laravel\InputParam;
 use Vladitot\Architect\Yaml\Laravel\OutputParam;

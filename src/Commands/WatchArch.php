@@ -2,6 +2,7 @@
 
 namespace Vladitot\Architect\Commands;
 
+use Illuminate\Support\Carbon;
 use Vladitot\Architect\Yaml\LoadModule;
 use Vladitot\Architect\Yaml\Memory;
 use Vladitot\Architect\Yaml\Module;
@@ -11,7 +12,7 @@ use Illuminate\Console\Command;
 use Vladitot\Architect\Yaml\SchemaGenerator;
 use Vladitot\Architect\YamlRenderPipeline;
 
-class WarchArch extends Command
+class WatchArch extends Command
 {
     /**
      * The name and signature of the console command.
@@ -34,6 +35,7 @@ class WarchArch extends Command
      */
     public function handle()
     {
+
         while (true) {
 
 
@@ -60,12 +62,15 @@ class WarchArch extends Command
             foreach ($project->modulePaths as $modulePathObject) {
                 @mkdir($modulePathObject->path_to_dir, 0777, true);
                 $filename = $modulePathObject->path_to_dir .'/'. $modulePathObject->module_name.'Module.yaml';
+
                 if (!file_exists($filename)) {
                     touch($filename);
                 }
                 $moduleData = yaml_parse_file($filename);
                 if ($moduleData !== null) {
                     $module = new Module();
+                    if (!Memory::shouldReRender($modulePathObject->module_name)) continue;
+                    echo 'Will re-generate module scheme: '.$modulePathObject->module_name."\n";
                     try {
                         LoadModule::createObjectAndFill($module, $moduleData);
                         Memory::$modules[$modulePathObject->module_name] = $module;
@@ -88,7 +93,6 @@ class WarchArch extends Command
                     base_path().'/Packages/'.$name . '/moduleSchema.json',
                     json_encode($schema, JSON_PRETTY_PRINT));
             }
-            echo 're-generated'."\n";
 
             $renderer = new YamlRenderPipeline();
 
@@ -99,7 +103,9 @@ class WarchArch extends Command
                 echo $e->getFile()."\n";
                 echo $e->getLine()."\n";
             }
-            
+
+            echo 'All good at '.Carbon::now()."\n";
+
             sleep(1);
         }
 

@@ -3,10 +3,10 @@
 namespace Vladitot\Architect\YamlComponents;
 
 
-use AbstractGenerator;
+use Vladitot\Architect\AbstractGenerator;
+use Vladitot\Architect\NamespaceAndPathGeneratorYaml;
 use Vladitot\Architect\Yaml\Laravel\ServiceAggregator;
 use Vladitot\Architect\Yaml\Module;
-use NamespaceAndPathGeneratorYaml;
 use Nette\PhpGenerator\ClassLike;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
@@ -88,10 +88,13 @@ class ServiceAggregatorGenerator extends AbstractGenerator
                 }
             }
             $codedMethod->addComment($aiQuery);
-            $methodBody = $this->queryAiForAnswer($aiQuery);
-            $matches = [];
-            preg_match('/{(.*)}/s', $methodBody, $matches);
-            $codedMethod->setBody($matches[1]);
+
+            if ($codedMethod->getBody()==='') {
+                $methodBody = $this->queryAiForAnswer($aiQuery);
+                $matches = [];
+                preg_match('/{(.*)}/s', $methodBody, $matches);
+                $codedMethod->setBody($matches[1]);
+            }
 
             $preparedToTestsMethod = clone $codedMethod;
             $preparedToTestsMethod->setComment('');

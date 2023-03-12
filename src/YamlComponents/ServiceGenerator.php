@@ -3,10 +3,10 @@
 namespace Vladitot\Architect\YamlComponents;
 
 
-use AbstractGenerator;
+use Vladitot\Architect\AbstractGenerator;
+use Vladitot\Architect\NamespaceAndPathGeneratorYaml;
 use Vladitot\Architect\Yaml\Laravel\Service;
 use Vladitot\Architect\Yaml\Module;
-use NamespaceAndPathGeneratorYaml;
 use Nette\PhpGenerator\ClassLike;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;

@@ -2,9 +2,9 @@
 
 namespace Vladitot\Architect\YamlComponents;
 
-use AbstractGenerator;
+use Vladitot\Architect\AbstractGenerator;
+use Vladitot\Architect\NamespaceAndPathGeneratorYaml;
 use Vladitot\Architect\Yaml\Module;
-use NamespaceAndPathGeneratorYaml;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 
@@ -13,7 +13,7 @@ class ServiceProviderGenerator extends AbstractGenerator
 
     public function generate(Module $module)
     {
-
+        if ($module->title=='') return '';
         $class = new ClassType(ucfirst($module->title).'ServiceProvider');
         $class->setExtends('\\Illuminate\\Support\\ServiceProvider');
 

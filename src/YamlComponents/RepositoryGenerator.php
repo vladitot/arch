@@ -3,10 +3,10 @@
 namespace Vladitot\Architect\YamlComponents;
 
 
-use AbstractGenerator;
+use Vladitot\Architect\AbstractGenerator;
+use Vladitot\Architect\NamespaceAndPathGeneratorYaml;
 use Vladitot\Architect\Yaml\Laravel\Repository;
 use Vladitot\Architect\Yaml\Module;
-use NamespaceAndPathGeneratorYaml;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 
@@ -87,10 +87,12 @@ class RepositoryGenerator extends AbstractGenerator
             $aiQuery.= rtrim($method->comment, '.').'. ';
             $aiQuery.= 'Write code of method body.';
             $codedMethod->addComment($aiQuery);
-            $methodBody = $this->queryAiForAnswer($aiQuery);
-            $matches = [];
-            preg_match('/{(.*)}/s', $methodBody, $matches);
-            $codedMethod->setBody($matches[1]);
+            if ($codedMethod->getBody()==='') {
+                $methodBody = $this->queryAiForAnswer($aiQuery);
+                $matches = [];
+                preg_match('/{(.*)}/s', $methodBody, $matches);
+                $codedMethod->setBody($matches[1]);
+            }
 
             $preparedToTestsMethod = clone $codedMethod;
             $preparedToTestsMethod->setComment('');

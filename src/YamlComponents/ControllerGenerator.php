@@ -2,12 +2,12 @@
 
 namespace Vladitot\Architect\YamlComponents;
 
-use AbstractGenerator;
+use Vladitot\Architect\AbstractGenerator;
+use Vladitot\Architect\NamespaceAndPathGeneratorYaml;
 use Vladitot\Architect\Yaml\Laravel\AggregatorMethod;
 use Vladitot\Architect\Yaml\Laravel\OutputParam;
 use Vladitot\Architect\Yaml\Laravel\ServiceAggregator;
 use Vladitot\Architect\Yaml\Module;
-use NamespaceAndPathGeneratorYaml;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\PhpNamespace;
 
@@ -20,9 +20,12 @@ class ControllerGenerator extends AbstractGenerator
 
         foreach ($serviceAggregators as $serviceAggregator) {
             foreach ($serviceAggregator->methods as $method) {
-                if (!isset($method->controller_fields) || $method->controller_fields===null) continue;
+                if (isset($method->controller_fields)) {
+                    $this->generateOneController($serviceAggregator, $module);
+                    break;
+                }
             }
-            $this->generateOneController($serviceAggregator, $module);
+
         }
     }
 
@@ -92,10 +95,12 @@ class ControllerGenerator extends AbstractGenerator
             $aiQuery.= $serviceAggregator->title.'ServiceAggregator::'.$method->title."\n";
 
             $codedMethod->addComment($aiQuery);
-            $methodBody = $this->queryAiForAnswer($aiQuery);
-            $matches = [];
-            preg_match('/{(.*)}/s', $methodBody, $matches);
-            $codedMethod->setBody($matches[1]);
+            if ($codedMethod->getBody()==='') {
+                $methodBody = $this->queryAiForAnswer($aiQuery);
+                $matches = [];
+                preg_match('/{(.*)}/s', $methodBody, $matches);
+                $codedMethod->setBody($matches[1]);
+            }
 
             $resource = $this->createResource($method, $module);
             $namespace->addUse($resource);

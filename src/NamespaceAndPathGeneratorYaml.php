@@ -1,5 +1,5 @@
 <?php
-
+namespace Vladitot\Architect;
 
 use Illuminate\Support\Str;
 
@@ -142,7 +142,7 @@ class NamespaceAndPathGeneratorYaml
 
     public static function generateServiceAggregatorNamespace(string $moduleTitle){
         return self::generateCustomNamespace(
-            $moduleTitle, 'ServicesAggregators'
+            $moduleTitle, 'ServiceAggregators'
         );
     }
 

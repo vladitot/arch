@@ -2,12 +2,12 @@
 
 namespace Vladitot\Architect\YamlComponents;
 
-use AbstractGenerator;
+use Vladitot\Architect\AbstractGenerator;
+use Vladitot\Architect\NamespaceAndPathGeneratorYaml;
 use Vladitot\Architect\Yaml\Laravel\AggregatorMethod;
 use Vladitot\Architect\Yaml\Laravel\InputParam;
 use Vladitot\Architect\Yaml\Laravel\OutputParam;
 use Vladitot\Architect\Yaml\Module;
-use NamespaceAndPathGeneratorYaml;
 
 class JsApiClientGenerator extends AbstractGenerator
 {
