@@ -91,7 +91,10 @@ class RepositoryGenerator extends AbstractGenerator
                 $methodBody = $this->queryAiForAnswer($aiQuery);
                 $matches = [];
                 preg_match('/{(.*)}/s', $methodBody, $matches);
-                $codedMethod->setBody($matches[1]);
+                $codedMethod->setBody(
+                    "throw new \Exception('You forget to check this repository method');"."\n".
+                    $matches[1]
+                );
             }
 
             $preparedToTestsMethod = clone $codedMethod;

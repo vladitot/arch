@@ -93,7 +93,10 @@ class ServiceAggregatorGenerator extends AbstractGenerator
                 $methodBody = $this->queryAiForAnswer($aiQuery);
                 $matches = [];
                 preg_match('/{(.*)}/s', $methodBody, $matches);
-                $codedMethod->setBody($matches[1]);
+                $codedMethod->setBody(
+                    "throw new \Exception('You forget to check this serviceAggregator method');"."\n".
+                    $matches[1]
+                );
             }
 
             $preparedToTestsMethod = clone $codedMethod;
