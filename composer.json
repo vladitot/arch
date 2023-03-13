@@ -18,7 +18,8 @@
         "nette/php-generator": "^4.0",
         "nikic/php-parser": "^4.15",
         "openai-php/client": "^0.3.1",
-        "spatie/laravel-data": "^3.1"
+        "spatie/laravel-data": "^3.1",
+        "spiral/roadrunner-laravel": "^5.11"
     },
     "extra": {
         "laravel": {

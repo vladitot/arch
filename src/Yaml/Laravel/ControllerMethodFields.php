@@ -8,4 +8,5 @@ class ControllerMethodFields extends Data
 {
     public string $route;
     public string $http_method;
+    public ?bool $public = false;
 }
