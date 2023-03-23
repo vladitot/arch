@@ -19,5 +19,5 @@ class Model extends Data
     /**
      * @var array|AdditionalMigration[] $additional_migrations;
      */
-    public ?array $additional_migrations;
+    public ?array $additional_migrations = [];
 }

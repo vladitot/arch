@@ -44,7 +44,7 @@ class ModelGenerator extends AbstractGenerator
             $class->removeProperty('connection');
         }
         $class->addProperty('connection')
-            ->setValue(NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($moduleTitle))
+            ->setValue('pgsql-'.NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($moduleTitle))
             ->setProtected();
     }
 

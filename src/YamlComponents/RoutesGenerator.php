@@ -70,8 +70,8 @@ class RoutesGenerator extends AbstractGenerator
                     . $method->controller_fields->route . '", [\\' . $controllerNamespace . '\\' . ucfirst($serviceAggregator->title) . 'Controller::class, "' . $method->title . '"])' . "\n";
                 $routeMethodBody .= "\t->name('" . lcfirst($serviceAggregator->title) . '.' . $method->title . "');";
                 $routeMethod->setBody($routeMethodBody);
-                $routesFileBody.= '\\'.$routesHelperNamespace->getName().'\\'.$class->getName().'::'.$method->title.'();'."\n";
             }
+            $routesFileBody.= '\\'.$routesHelperNamespace->getName().'\\'.$class->getName().'::'.$method->title.'();'."\n";
         }
 
         $routesHelperNamespace->addUse(\Illuminate\Support\Facades\Route::class);

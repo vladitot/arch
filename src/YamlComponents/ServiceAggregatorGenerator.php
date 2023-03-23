@@ -3,6 +3,7 @@
 namespace Vladitot\Architect\YamlComponents;
 
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Vladitot\Architect\AbstractGenerator;
 use Vladitot\Architect\NamespaceAndPathGeneratorYaml;
 use Vladitot\Architect\Yaml\Laravel\ServiceAggregator;
@@ -203,7 +204,7 @@ class ServiceAggregatorGenerator extends AbstractGenerator
     {
         $serviceTestClassPath = NamespaceAndPathGeneratorYaml::generateServiceAggregatorTestPath(
             $module->title,
-            $serviceAggregator->title.'ServiceTest');
+            $serviceAggregator->title.'ServiceAggregatorTest');
 
         $serviceTestNamespace = new PhpNamespace( NamespaceAndPathGeneratorYaml::generateServiceAggregatorTestNamespace(
             $module->title,
@@ -215,6 +216,7 @@ class ServiceAggregatorGenerator extends AbstractGenerator
             $testClass = \Nette\PhpGenerator\ClassType::fromCode(file_get_contents($serviceTestClassPath));
         } else {
             $testClass = new ClassType($serviceAggregator->title.'ServiceAggregatorTest');
+            $testClass->addTrait('\\Tests\\CustomRefreshDatabase');
         }
 
         $serviceTestNamespace->add($testClass);
@@ -229,7 +231,7 @@ class ServiceAggregatorGenerator extends AbstractGenerator
         foreach ($serviceAggregator->methods as $testableServiceMethod) {
             if ($testClass->hasMethod('test'.ucfirst($testableServiceMethod->title))) continue;
 
-            $aiQuery = 'PHP Laravel. Write Tests and dataProviders for method below, connect dataProviders via annotations.'."\n"
+            $aiQuery = 'PHP Laravel. Write Tests and dataProviders for method below, connect dataProviders via annotations. Make dataProvider function static. '."\n"
                 .'Mock Dependencies. Put result class into namespace: \\'
                 .NamespaceAndPathGeneratorYaml::generateServiceAggregatorTestNamespace($module->title)." Add to start of each test method line: \"throw new \Exception('You forget to check this test');\"\n\n";
             $aiQuery .= $fileHeader."\n";

@@ -1,0 +1,70 @@
+version: v2beta1
+name: change-me
+vars:
+  DEVSPACE_ENV_FILE: ".env.infra"
+  K8S_ENV:
+    source: env
+    default: ""
+  NAMESPACE:
+    source: env
+    default: ${DEVSPACE_NAME}-${K8S_ENV}
+
+dev:
+  app-http:
+    namespace: ${NAMESPACE}
+    labelSelector:
+      http-development-container: "true"
+    container: roadrunner-http
+    command:
+      - /usr/local/bin/rr
+    args:
+      - serve
+      - -c
+      - /var/www/infra/rr/rr.${K8S_ENV}.yaml
+    sync:
+      - path: ./:/var/www/
+        startContainer: true
+        excludePaths:
+          - node_modules/
+          - .git/
+    arch: arm64
+
+  app-dev:
+    namespace: ${NAMESPACE}
+    labelSelector:
+      development-container: "true"
+    container: roadrunner-dev
+    command:
+      - /usr/local/bin/rr
+    args:
+      - serve
+      - -c
+      - /var/www/infra/rr/rr.dev-container.yaml
+    sync:
+      - path: ./:/var/www/
+        startContainer: true
+        excludePaths:
+          - node_modules/
+          - .git/
+    arch: arm64
+    terminal:
+      disableReplace: true
+      workDir: /var/www
+
+deployments:
+  app:
+    namespace: ${NAMESPACE}
+    helm:
+      chart:
+        name: universal-chart
+        version: 2.3.0
+        repo: https://registry.nixys.ru/chartrepo/public
+      releaseName: ${DEVSPACE_NAME}-${K8S_ENV}
+      upgradeArgs:
+        - "--wait"
+        - "--history-max"
+        - "6"
+      valuesFiles:
+        - infra/values/${K8S_ENV}.values.yaml
+        - pullKey.yaml
+        - customValues.yaml

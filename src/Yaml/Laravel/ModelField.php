@@ -7,7 +7,7 @@ use Spatie\LaravelData\Data;
 class ModelField extends Data
 {
     public string $title;
-    public ?string $additional_migration_argument;
+    public ?string $additional_migration_argument = '';
 
     /**
      * @var string $field_type
@@ -19,13 +19,13 @@ class ModelField extends Data
      * @var string $faker_value
      * @autocompleteFunction getFakerValues
      */
-    public string $faker_value;
+    public string $faker_value = '';
 
-    public ?string $faker_arguments;
+    public ?string $faker_arguments = null;
 
-    public ?bool $nullable;
+    public ?bool $nullable = false;
 
-    public ?string $default;
+    public ?string $default = null;
 
     public static function getFakerValues() {
         return [

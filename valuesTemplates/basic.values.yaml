@@ -1,0 +1,90 @@
+deployments:
+  metrics-app-deployment:
+    containers:
+      - name: roadrunner-metrics
+        image: "{{ $.Values.applicationImage }}"
+        imageTag: "{{ $.Values.imageTag }}"
+        command: /usr/local/bin/rr
+        args: ["serve", "-c", "{{ $.Values.rrMetricsConfigPath }}"]
+  dev-deployment:
+    podLabels:
+      development-container: "true"
+    containers:
+      - name: roadrunner-dev
+        envsFromConfigmap:
+          - name: app-config
+        image: "{{ $.Values.applicationDevImage }}"
+        imageTag: "{{ $.Values.imageDevTag }}"
+        command: /usr/local/bin/rr
+        args: [ "serve", "-c", "{{ $.Values.rrHttpConfigPath }}" ]
+  database:
+    extraSelectorLabels:
+      serviced-db-deployment: "5432"
+    containers:
+      - name: database
+        image: gradescope/postgresql-multiple-databases
+        imageTag: 14.4
+  http-app-deployment:
+    extraSelectorLabels:
+      serviced-http-deployment: "8080"
+    podLabels:
+      http-development-container: "true"
+    containers:
+      - name: roadrunner-http
+        envsFromConfigmap:
+          - name: app-config
+        image: "{{ $.Values.applicationImage }}"
+        imageTag: "{{ $.Values.imageTag }}"
+        command: /usr/local/bin/rr
+        args: ["serve", "-c", ""]
+  consumer-app-deployment:
+    containers:
+      - name: roadrunner-consumer
+        envsFromConfigmap:
+          - name: app-config
+        image: "{{ $.Values.applicationImage }}"
+        imageTag: "{{ $.Values.imageTag }}"
+        command: /usr/local/bin/rr
+        args: ["serve", "-c", "{{ $.Values.rrConsumerConfigPath }}"]
+
+services:
+  http-app-service:
+    extraSelectorLabels:
+      serviced-http-deployment: "8080"
+    ports:
+      - port: 8080
+        targetPort: 8080
+        protocol: TCP
+        name: http
+  db-service:
+    extraSelectorLabels:
+      serviced-db-deployment: "5432"
+    ports:
+      - port: 5432
+        targetPort: 5432
+        protocol: TCP
+        name: db
+ingresses:
+   http-app-ingress:
+      hosts:
+        - hostname: "{{ $.Values.httpIngressHostname }}"
+          paths:
+            - path: /
+              serviceName: http-app-service
+              servicePort: 8080
+
+configMaps:
+  app-config:
+    data:
+      "{{ $.Values.appConfig | toYaml | nindent 6 }}"
+
+cronJobs:
+  laravel-cron:
+    schedule: "* * * * *"
+    containers:
+      - image: "{{ $.Values.applicationImage }}"
+        envsFromConfigmap:
+          - name: app-config
+        imageTag: "{{ $.Values.imageTag }}"
+        command: php
+        args: ["/var/www/artisan", "schedule:run"]

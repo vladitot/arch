@@ -138,7 +138,7 @@ class MigrationGenerator extends AbstractGenerator
         $downMethod = $class->addMethod('down');
         $tableName = NamespaceAndPathGeneratorYaml::generateTableNameFromModelName($model->title);
         $fields = $model->model_fields;
-        $upBody = 'Schema::connection("'.NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($module->title).'")->create(\''.$tableName.'\', function (Blueprint $table) {'."\n";
+        $upBody = 'Schema::connection("pgsql-'.NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($module->title).'")->create(\''.$tableName.'\', function (Blueprint $table) {'."\n";
 
 
         foreach ($fields as $field) {
@@ -181,11 +181,11 @@ class MigrationGenerator extends AbstractGenerator
         $tableName = NamespaceAndPathGeneratorYaml::generateTableNameFromModelName($model->title);
 
         $aiQuery = 'PHP, Laravel. Generate migration for application.'."\n";
-        $aiQuery .= 'Connection name: '.NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($moduleTitle).'.'."\n";
+        $aiQuery .= 'Connection name: pgsql-'.NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($moduleTitle).'.'."\n";
         $aiQuery .= 'Table name: '.$tableName.'.'."\n";
         $aiQuery .= $additionalMigration->comment."\n";
 
-        $upBody = 'Schema::connection("'.NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($moduleTitle).'")->table(\''.$tableName.'\', function (Blueprint $table) {'."\n";
+        $upBody = 'Schema::connection("pgsql-'.NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($moduleTitle).'")->table(\''.$tableName.'\', function (Blueprint $table) {'."\n";
 //        $upBody.='throw new \\Exception("You forgot to fill method UP in additional migration for '.$moduleTitle.' Module");'."\n";
         $methodBody = $this->queryAiForAnswer($aiQuery);
         $matches = [];
@@ -196,7 +196,7 @@ class MigrationGenerator extends AbstractGenerator
         $upMethod->addBody("\n".'});');
 
 
-        $downBody = 'Schema::connection("'.NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($moduleTitle).'")->table(\''.$tableName.'\', function (Blueprint $table) {'."\n";
+        $downBody = 'Schema::connection("pgsql-'.NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($moduleTitle).'")->table(\''.$tableName.'\', function (Blueprint $table) {'."\n";
         $matches = [];
         preg_match('/down\(\)\s+{\s*.*?{(.*?)}/s', $methodBody, $matches);
         $downBody.='throw new \Exception("You forgot to check this migration");'."\n";

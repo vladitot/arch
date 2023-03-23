@@ -46,37 +46,43 @@ abstract class AbstractGenerator
     }
 
 
-    protected function prepareAiQueryForInputDtoParams(\Vladitot\Architect\Yaml\Laravel\Method|AggregatorMethod $method) {
+    protected function prepareAiQueryForInputDtoParams(\Vladitot\Architect\Yaml\Laravel\Method|AggregatorMethod $method)
+    {
         $aiQuery = '';
-        if (count($method->inputParams)>1) {
-            $type = ucfirst($method->title).'InDto';
-            $aiQuery.= 'Argument with type is DTO named inDto('.$type.'). ';
-            $aiQuery.= 'Input DTO fields with types: ';
-            foreach ($method->inputParams as $param) {
-                $aiQuery.= $param->title.'('.$param->type.'), ';
+        if (isset($method->inputParams)) {
+
+            if (count($method->inputParams) > 1) {
+                $type = ucfirst($method->title) . 'InDto';
+                $aiQuery .= 'Argument with type is DTO named inDto(' . $type . '). ';
+                $aiQuery .= 'Input DTO fields with types: ';
+                foreach ($method->inputParams as $param) {
+                    $aiQuery .= $param->title . '(' . $param->type . '), ';
+                }
+                $aiQuery = substr($aiQuery, 0, -2) . '. Use Input DTO Fields With "Where".';
             }
-            $aiQuery = substr($aiQuery, 0, -2).'. Use Input DTO Fields With "Where".';
-        }
-        if (count($method->inputParams)==1) {
-            $paramFromDb = $method->inputParams[0];
-            $aiQuery.= 'Argument with type: '.$paramFromDb->title.'('.$paramFromDb->type.'). ';
+            if (count($method->inputParams) == 1) {
+                $paramFromDb = $method->inputParams[0];
+                $aiQuery .= 'Argument with type: ' . $paramFromDb->title . '(' . $paramFromDb->type . '). ';
+            }
         }
 
-        if (count($method->outputParams)>1) {
-            $returnType = ucfirst($method->title).'OutDto';
-            $aiQuery.= 'Output type is DTO with type: '.$returnType.'. ';
-            $aiQuery.= 'Output DTO fields (and also Output DTO constructor parameters) with types: ';
-            foreach ($method->outputParams as $param) {
-                $aiQuery.= $param->title.'('.$param->type.'), ';
+        if (isset($method->outputParams)) {
+            if (count($method->outputParams) > 1) {
+                $returnType = ucfirst($method->title) . 'OutDto';
+                $aiQuery .= 'Output type is DTO with type: ' . $returnType . '. ';
+                $aiQuery .= 'Output DTO fields (and also Output DTO constructor parameters) with types: ';
+                foreach ($method->outputParams as $param) {
+                    $aiQuery .= $param->title . '(' . $param->type . '), ';
+                }
+                $aiQuery = substr($aiQuery, 0, -2) . '. ';
             }
-            $aiQuery = substr($aiQuery, 0, -2).'. ';
-        }
-        if (count($method->outputParams)==1) {
-            $paramFromDb = $method->outputParams[0];
-            $aiQuery.= 'Output type is '.$paramFromDb->type.'. ';
-        }
-        if (count($method->outputParams)==0) {
-            $aiQuery.= 'Output type is void. ';
+            if (count($method->outputParams) == 1) {
+                $paramFromDb = $method->outputParams[0];
+                $aiQuery .= 'Output type is ' . $paramFromDb->type . '. ';
+            }
+            if (count($method->outputParams) == 0) {
+                $aiQuery .= 'Output type is void. ';
+            }
         }
         return $aiQuery;
     }
@@ -93,44 +99,48 @@ abstract class AbstractGenerator
      */
     protected function fillMethodWithParametersAndTypesOrDtos(\Vladitot\Architect\Yaml\Laravel\Method|AggregatorMethod $method, Method $codedMethod, PhpNamespace $namespace, string $dtoNamespace, string $dtoDirname): void
     {
-        if (count($method->inputParams)>1 || $method instanceof AggregatorMethod) {
-            $type = $this->createDtoRecursively(
-                params: $method->inputParams,
-                methodName: $method->title,
-                namespace: $dtoNamespace,
-                dtoDirname: $dtoDirname,
-                postfix: 'InDto'
-            );
-            $namespace->addUse($type);
-            $codedMethod->addParameter('inDto')
-                ->setType(
-                    $type
+        if (isset($method->inputParams)) {
+            if ((count($method->inputParams) > 1 || $method instanceof AggregatorMethod)) {
+                $type = $this->createDtoRecursively(
+                    params: $method->inputParams,
+                    methodName: $method->title,
+                    namespace: $dtoNamespace,
+                    dtoDirname: $dtoDirname,
+                    postfix: 'InDto'
                 );
-        } elseif (count($method->inputParams)==1) {
-            $paramFromDb = $method->inputParams[0];
-            $codedMethod->addParameter($paramFromDb->title)
-                ->setType($paramFromDb->type);
+                $namespace->addUse($type);
+                $codedMethod->addParameter('inDto')
+                    ->setType(
+                        $type
+                    );
+            } elseif (count($method->inputParams) == 1) {
+                $paramFromDb = $method->inputParams[0];
+                $codedMethod->addParameter($paramFromDb->title)
+                    ->setType($paramFromDb->type);
+            }
+            ////end of input
         }
-        ////end of input
 
         ////output
-        if (count($method->outputParams)>1 || $method instanceof AggregatorMethod) {
-            $returnType = $this->createDtoRecursively(
-                params: $method->outputParams,
-                methodName: $method->title,
-                namespace: $dtoNamespace,
-                dtoDirname: $dtoDirname,
-                postfix: 'OutDto'
-            );
-            $namespace->addUse($returnType);
-            $codedMethod->setReturnType(
-                $returnType
-            );
-        } elseif (count($method->outputParams)==1) {
-            $paramFromDb = $method->outputParams[0];
-            $codedMethod->setReturnType($paramFromDb->type);
-        } elseif (count($method->outputParams)==0) {
-            $codedMethod->setReturnType('void');
+        if (isset($method->outputParams)) {
+            if ((count($method->outputParams) > 1 || $method instanceof AggregatorMethod)) {
+                $returnType = $this->createDtoRecursively(
+                    params: $method->outputParams,
+                    methodName: $method->title,
+                    namespace: $dtoNamespace,
+                    dtoDirname: $dtoDirname,
+                    postfix: 'OutDto'
+                );
+                $namespace->addUse($returnType);
+                $codedMethod->setReturnType(
+                    $returnType
+                );
+            } elseif (count($method->outputParams) == 1) {
+                $paramFromDb = $method->outputParams[0];
+                $codedMethod->setReturnType($paramFromDb->type);
+            } elseif (count($method->outputParams) == 0) {
+                $codedMethod->setReturnType('void');
+            }
         }
         ////end of output
     }

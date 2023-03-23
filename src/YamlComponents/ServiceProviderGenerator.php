@@ -60,7 +60,7 @@ class ServiceProviderGenerator extends AbstractGenerator
                     $serviceAggregator->title.'Routes',
                 );
 
-                $bootBody.="Route::middleware('api')\n";
+                $bootBody.="Route::middleware('api')\n->prefix('api')\n";
                 $filePathOfRouteFile = NamespaceAndPathGeneratorYaml::generateRoutesPath(
                     $module->title,
                     $serviceAggregator->title.'Routes',

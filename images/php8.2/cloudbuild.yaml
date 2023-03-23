@@ -1,0 +1,45 @@
+steps:
+  - name: 'gcr.io/kaniko-project/executor:latest'
+    id: build-1
+    args:
+      [
+        "--context=./",
+        "--dockerfile=./Dockerfile",
+        "--target=base",
+        "--cache=true",
+        "--cache-ttl=72h",
+        "--destination=asia-southeast2-docker.pkg.dev/kobain/kobain/php8.2:$_TAG-base",
+        "--destination=asia-southeast2-docker.pkg.dev/kobain/kobain/php8.2:latest-base",
+      ]
+  - name: 'gcr.io/kaniko-project/executor:latest'
+    id: build-2
+    waitFor:
+      - build-1
+    args:
+      [
+        "--context=./",
+        "--dockerfile=./Dockerfile",
+        "--target=local",
+        "--cache=true",
+        "--cache-ttl=72h",
+        "--destination=asia-southeast2-docker.pkg.dev/kobain/kobain/php8.2:$_TAG-local",
+        "--destination=asia-southeast2-docker.pkg.dev/kobain/kobain/php8.2:latest-local",
+      ]
+  - name: 'gcr.io/kaniko-project/executor:latest'
+    id: build-3
+    waitFor:
+      - build-2
+    args:
+      [
+        "--context=./",
+        "--dockerfile=./Dockerfile",
+        "--target=local-xdebug",
+        "--cache=true",
+        "--cache-ttl=72h",
+        "--destination=asia-southeast2-docker.pkg.dev/kobain/kobain/php8.2:$_TAG-local-xdebug",
+        "--destination=asia-southeast2-docker.pkg.dev/kobain/kobain/php8.2:latest-local-xdebug",
+      ]
+timeout: 1200s
+#options:
+#  machineType: N1_HIGHCPU_8
+#  logging: CLOUD_LOGGING_ONLY

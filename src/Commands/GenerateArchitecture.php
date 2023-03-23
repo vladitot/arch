@@ -2,12 +2,14 @@
 
 namespace Vladitot\Architect\Commands;
 
+use Vladitot\Architect\InfrastructureGenerator;
 use Vladitot\Architect\Yaml\LoadModule;
 use Vladitot\Architect\Yaml\Memory;
 use Vladitot\Architect\Yaml\Module;
 use Vladitot\Architect\Yaml\ModulePath;
 use Vladitot\Architect\Yaml\Project;
 use Illuminate\Console\Command;
+use Vladitot\Architect\YamlRenderPipeline;
 
 class GenerateArchitecture extends Command
 {
@@ -32,6 +34,7 @@ class GenerateArchitecture extends Command
      */
     public function handle()
     {
+
         $currentProjectConfig = yaml_parse_file(base_path('project.yaml'));
 
         $project = Project::from($currentProjectConfig);
@@ -39,6 +42,7 @@ class GenerateArchitecture extends Command
         foreach ($project->modulePaths as &$modulePath) {
             $modulePath = ModulePath::from($modulePath);
         }
+        $renderer = new YamlRenderPipeline();
 
         Memory::$project = $project;
 
@@ -65,7 +69,9 @@ class GenerateArchitecture extends Command
             }
         }
 
-        $renderer = new YamlRenderPipeline();
+        $infraRenderer = new InfrastructureGenerator();
+        $infraRenderer->generateInfra($project, Memory::$modules);
+
         $renderer->generate();
         return Command::SUCCESS;
     }
