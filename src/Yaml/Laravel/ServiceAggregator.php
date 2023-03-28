@@ -8,12 +8,12 @@ use Spatie\LaravelData\Data;
 class ServiceAggregator extends Data
 {
     public string $title;
-    public string $comment;
+    public ?string $comment = '';
 
     /**
      * @var array|AggregatorMethod[] $methods;
      */
-    public array $methods;
+    public array $methods = [];
 
     /**
      * @var array|string[] $services;
