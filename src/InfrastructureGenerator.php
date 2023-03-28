@@ -63,10 +63,20 @@ class InfrastructureGenerator
         if (!strpos($gitignore, 'pullKey.yaml')) {
             $gitignore.="\npullKey.yaml\n";
         }
-        file_put_contents(base_path().'/.gitignore', $gitignore);
+
+        if (!file_exists(base_path().'/customValuesCommitted.yaml')) {
+            touch(base_path().'/customValuesCommitted.yaml');
+        }
+
         if (!file_exists(base_path().'/customValues.yaml')) {
             touch(base_path().'/customValues.yaml');
         }
+
+        if (!strpos($gitignore, 'customValues.yaml')) {
+            $gitignore.="\ncustomValues.yaml\n";
+        }
+
+        file_put_contents(base_path().'/.gitignore', $gitignore);
         $template['name'] = $project->title ?? '';
         yaml_emit_file(base_path().'/devspace.yaml', $template);
     }

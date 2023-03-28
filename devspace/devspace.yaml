@@ -67,4 +67,5 @@ deployments:
       valuesFiles:
         - infra/values/${K8S_ENV}.values.yaml
         - pullKey.yaml
+        - customValuesCommitted.yaml
         - customValues.yaml
