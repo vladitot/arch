@@ -47,6 +47,7 @@ class SchemaGenerate extends Command
 
             if (!file_exists(base_path('project.yaml'))) {
                 touch(base_path('project.yaml'));
+                file_put_contents(base_path('.gitignore'), 'projectSchema.json', FILE_APPEND);
             }
 
             if (!file_exists(base_path('project.yaml')) || file_get_contents(base_path('project.yaml')) === '') {
