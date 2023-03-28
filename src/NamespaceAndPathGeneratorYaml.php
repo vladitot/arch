@@ -282,7 +282,7 @@ class NamespaceAndPathGeneratorYaml
 
     public static function generateServiceDTOPath(string $moduleTitle, string $title) {
         return self::generateCustomPath(
-            $moduleTitle, $title, 'ServiceAggregatorDTO'
+            $moduleTitle, $title, 'ServiceDTO'
         );
     }
 

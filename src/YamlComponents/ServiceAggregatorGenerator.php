@@ -122,10 +122,13 @@ class ServiceAggregatorGenerator extends AbstractGenerator
             if ($class->hasMethod('__construct')) {
                 $constructor = $class->getMethod('__construct');
                 $constructor->setParameters([]);
-                $constructor->setBody('');
+                $body = $constructor->getBody();
+                $body = preg_replace(';//architectInjections.*//endOfArchitectInjections\n*;s', '', $body);
             } else {
                 $constructor = $class->addMethod('__construct');
+                $body = '';
             }
+            $injectionBody = '';
 
             $injectableServiceNamespace = NamespaceAndPathGeneratorYaml::generateServiceNamespace(
                 $module->title,
@@ -155,9 +158,10 @@ class ServiceAggregatorGenerator extends AbstractGenerator
                         ->setVisibility('private')
                         ->setType($fullInjectableServiceName);
 
-                    $constructor->addBody('$this->' . lcfirst($injectionService->title) . 'Service = $' . lcfirst($injectionService->title) . 'Service;');
+                    $injectionBody.='$this->' . lcfirst($injectionService->title) . 'Service = $' . lcfirst($injectionService->title) . 'Service;';
                 }
             }
+            $constructor->setBody("//architectInjections\n".$injectionBody."\n//endOfArchitectInjections\n".$body);
         }
 
 
@@ -231,22 +235,29 @@ class ServiceAggregatorGenerator extends AbstractGenerator
         foreach ($serviceAggregator->methods as $testableServiceMethod) {
             if ($testClass->hasMethod('test'.ucfirst($testableServiceMethod->title))) continue;
 
-            $aiQuery = 'PHP Laravel. Write Tests and dataProviders for method below, connect dataProviders via annotations. Make dataProvider function static. '."\n"
-                .'Mock Dependencies. Put result class into namespace: \\'
-                .NamespaceAndPathGeneratorYaml::generateServiceAggregatorTestNamespace($module->title)." Add to start of each test method line: \"throw new \Exception('You forget to check this test');\"\n\n";
-            $aiQuery .= $fileHeader."\n";
-            $aiQuery .= $methodsText[$testableServiceMethod->title]."\n\n";
-            $aiQuery .='}'. "\n\n";
+            $testMethod = $testClass->addMethod('test'.ucfirst($testableServiceMethod->title))->setPublic();
+            $dataProviderMethod = $testClass->addMethod('dataProvider'.ucfirst($testableServiceMethod->title))->setPublic();
+            $dataProviderMethod->setStatic(true);
+            $dataProviderMethod->setBody('return [ [] ];');
+            $dataProviderMethod->addComment('@return array');
+            $testMethod->addComment('@dataProvider dataProvider'.ucfirst($testableServiceMethod->title));
 
-            $aiResult = $this->queryAiForAnswer($aiQuery);
-            preg_match_all('/use\s.*?;/s', $aiResult, $uses);
-            foreach ($uses[0] as $use) {
-                $use = str_replace('use ', '\\', $use);
-                $use = str_replace(';', '', $use);
-                $serviceTestNamespace->addUse($use);
-            }
-            preg_match('/{(.*)}/s', $aiResult, $body);
-            $responseTestMethods[] = $body[1];
+//            $aiQuery = 'PHP Laravel. Write Tests and dataProviders for method below, connect dataProviders via annotations. Make dataProvider function static. '."\n"
+//                .'Mock Dependencies. Put result class into namespace: \\'
+//                .NamespaceAndPathGeneratorYaml::generateServiceAggregatorTestNamespace($module->title)." Add to start of each test method line: \"throw new \Exception('You forget to check this test');\"\n\n";
+//            $aiQuery .= $fileHeader."\n";
+//            $aiQuery .= $methodsText[$testableServiceMethod->title]."\n\n";
+//            $aiQuery .='}'. "\n\n";
+//
+//            $aiResult = $this->queryAiForAnswer($aiQuery);
+//            preg_match_all('/use\s.*?;/s', $aiResult, $uses);
+//            foreach ($uses[0] as $use) {
+//                $use = str_replace('use ', '\\', $use);
+//                $use = str_replace(';', '', $use);
+//                $serviceTestNamespace->addUse($use);
+//            }
+//            preg_match('/{(.*)}/s', $aiResult, $body);
+//            $responseTestMethods[] = $body[1];
 
         }
 

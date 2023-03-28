@@ -57,7 +57,7 @@ class RoutesGenerator extends AbstractGenerator
 
         $routesFileBody = '';
 
-
+        $routesDetected = false;
         foreach ($serviceAggregator->methods as $method) {
             if (!isset($method->controller_fields)) continue;
             if ($class->hasMethod($method->title)) {
@@ -72,7 +72,10 @@ class RoutesGenerator extends AbstractGenerator
                 $routeMethod->setBody($routeMethodBody);
             }
             $routesFileBody.= '\\'.$routesHelperNamespace->getName().'\\'.$class->getName().'::'.$method->title.'();'."\n";
+            $routesDetected = true;
         }
+
+        if (!$routesDetected) return;
 
         $routesHelperNamespace->addUse(\Illuminate\Support\Facades\Route::class);
 //        $body = '';

@@ -108,7 +108,7 @@ class YamlRenderPipeline
 
         $body = 'if (! RefreshDatabaseState::$migrated) {'."\n";
         foreach ($modules as $module) {
-            $body.='$this->artisan(\'migrate:fresh\', array_merge($this->migrateFreshUsing(), [\'--path\'=>\'Packages/'.ucfirst($module->title).'/Migrations\']));'."\n\t\t";
+            $body.='$this->artisan(\'migrate:fresh\', array_merge($this->migrateFreshUsing(), [\'--database\'=>\'pgsql-'.strtolower($module->title).'\', \'--path\'=>\'Packages/'.ucfirst($module->title).'/Migrations\']));'."\n\t\t";
         }
 
         $body.='
@@ -154,7 +154,7 @@ class YamlRenderPipeline
         $composerJson = json_decode(file_get_contents(base_path().'/composer.json'), true);
         $composerJson['scripts']['migrate'] = [];
         foreach ($modules as $module) {
-            $composerJson['scripts']['migrate'][] = '@php artisan migrate --path=Packages/'.ucfirst($module->title).'/Migrations';
+            $composerJson['scripts']['migrate'][] = '@php artisan migrate  --database=pgsql-'.strtolower($module->title).' --path=Packages/'.ucfirst($module->title).'/Migrations';
         }
 
         file_put_contents(base_path().'/composer.json', json_encode($composerJson, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));

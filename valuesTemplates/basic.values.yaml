@@ -66,6 +66,7 @@ services:
         name: db
 ingresses:
    http-app-ingress:
+      ingressClassName: "nginx"
       hosts:
         - hostname: "{{ $.Values.httpIngressHostname }}"
           paths:

@@ -2,7 +2,6 @@
 
 namespace Vladitot\Architect\YamlComponents;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Vladitot\Architect\AbstractGenerator;
 use Vladitot\Architect\NamespaceAndPathGeneratorYaml;
 use Vladitot\Architect\Yaml\Laravel\AggregatorMethod;
@@ -26,7 +25,6 @@ class ControllerGenerator extends AbstractGenerator
                     break;
                 }
             }
-
         }
     }
 
@@ -145,12 +143,7 @@ class ControllerGenerator extends AbstractGenerator
             ->addParameter('request');
 
 
-
         $toArrayBody = 'return $this->resource->toArray();'."\n";
-
-//        $toArrayBody = 'return ['."\n";
-
-//        $dtoResource = $this->prepareDtoForJsonResource($methodName, $outputParams);
 
         $fullAggregatedServiceOutputDtoName = NamespaceAndPathGeneratorYaml::generateServiceAggregatorDTONamespace(
                 $module->title,
@@ -158,11 +151,6 @@ class ControllerGenerator extends AbstractGenerator
 
         $class->addComment('@property \\'.$fullAggregatedServiceOutputDtoName.' $resource');
 
-//        foreach ($outputParams as $param) {
-//            $toArrayBody .= "'".$param->title."' => ".'$this->resource->'.$param->title.','."\n";
-//        }
-
-//        $toArrayBody .='];';
 
         $toArrayMethod->setBody($toArrayBody);
 
@@ -288,22 +276,12 @@ class ControllerGenerator extends AbstractGenerator
         foreach ($serviceAggregator->methods as $testableServiceMethod) {
             if ($testClass->hasMethod('test'.ucfirst($testableServiceMethod->title))) continue;
 
-            $aiQuery = 'PHP Laravel. Write Tests and dataProviders for method below, connect dataProviders via annotations. Make dataProvider function static. '."\n"
-                .'Mock Dependencies. Put result class into namespace: \\'
-                .NamespaceAndPathGeneratorYaml::generateServiceAggregatorTestNamespace($module->title)." Add to start of each test method line: \"throw new \Exception('You forget to check this test');\"\n\n";
-            $aiQuery .= $fileHeader."\n";
-            $aiQuery .= $methodsText[$testableServiceMethod->title]."\n\n";
-            $aiQuery .='}'. "\n\n";
-
-            $aiResult = $this->queryAiForAnswer($aiQuery);
-            preg_match_all('/use\s.*?;/s', $aiResult, $uses);
-            foreach ($uses[0] as $use) {
-                $use = str_replace('use ', '\\', $use);
-                $use = str_replace(';', '', $use);
-                $controllerTestNamespace->addUse($use);
-            }
-            preg_match('/{(.*)}/s', $aiResult, $body);
-            $responseTestMethods[] = $body[1];
+            $testMethod = $testClass->addMethod('test'.ucfirst($testableServiceMethod->title))->setPublic();
+            $dataProviderMethod = $testClass->addMethod('dataProvider'.ucfirst($testableServiceMethod->title))->setPublic();
+            $dataProviderMethod->setStatic();
+            $dataProviderMethod->setBody('return [ [] ];');
+            $dataProviderMethod->addComment('@return array');
+            $testMethod->addComment('@dataProvider dataProvider'.ucfirst($testableServiceMethod->title));
 
         }
 

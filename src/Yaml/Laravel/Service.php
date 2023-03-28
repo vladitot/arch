@@ -13,13 +13,13 @@ class Service extends Data
     /**
      * @var array|Method[] $methods;
      */
-    public array $methods;
+    public array $methods = [];
 
     /**
      * @var array|string[] $repositories;
      * @autocompleteFunction getRepositoriesFromModule
      */
-    public ?array $repositories;
+    public ?array $repositories = [];
 
     public static function getRepositoriesFromModule() {
         $currentModulePath = Memory::$currentModuleName;

@@ -32,7 +32,7 @@ abstract class AbstractGenerator
         $class->addMethod('rules')
             ->setBody($rulesBody)
             ->setReturnType('array')
-            ->setPrivate();
+            ->setPublic();
 
         if (!$skipValidateSimple) {
             $class->addMethod('validateSimple')
@@ -177,6 +177,7 @@ abstract class AbstractGenerator
      * @return mixed
      */
     protected function queryAiForAnswer(string $question) {
+        return "{\n //someBody \n}";
         $client = OpenAI::client('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');
 
         try {
@@ -211,7 +212,6 @@ abstract class AbstractGenerator
      */
     protected function createDtoRecursively(iterable $params, string $methodName, string $namespace, string $dtoDirname, string $postfix, string $middlefix='') {
         $class = new ClassType(ucfirst($methodName).$middlefix.$postfix);
-
         $constructor = $class->addMethod('__construct')
             ->setPublic();
         $constructorBody = '';

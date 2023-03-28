@@ -203,22 +203,28 @@ class RepositoryGenerator extends AbstractGenerator
         foreach ($repository->methods as $testableRepositoryMethod) {
             if ($testClass->hasMethod('test'.ucfirst($testableRepositoryMethod->title))) continue;
 
-            $aiQuery = 'PHP Laravel. Write Tests and dataProviders for method below, connect dataProviders via annotations. Make dataProvider function static. '."\n"
-                .'Mock Dependencies. Put result class into namespace: \\'
-                .NamespaceAndPathGeneratorYaml::generateRepositoryTestNamespace($module->title)." Add to start of each test method line: \"throw new \Exception('You forget to check this test');\"\n\n";
-            $aiQuery .= $fileHeader."\n";
-            $aiQuery .= $methodsText[$testableRepositoryMethod->title]."\n\n";
-            $aiQuery .='}'. "\n\n";
-
-            $aiResult = $this->queryAiForAnswer($aiQuery);
-            preg_match_all('/use\s.*?;/s', $aiResult, $uses);
-            foreach ($uses[0] as $use) {
-                $use = str_replace('use ', '\\', $use);
-                $use = str_replace(';', '', $use);
-                $serviceTestNamespace->addUse($use);
-            }
-            preg_match('/{(.*)}/s', $aiResult, $body);
-            $responseTestMethods[] = $body[1];
+            $testMethod = $testClass->addMethod('test'.ucfirst($testableRepositoryMethod->title))->setPublic();
+            $dataProviderMethod = $testClass->addMethod('dataProvider'.ucfirst($testableRepositoryMethod->title))->setPublic();
+            $dataProviderMethod->setStatic(true);
+            $dataProviderMethod->setBody('return [ [] ];');
+            $dataProviderMethod->addComment('@return array');
+            $testMethod->addComment('@dataProvider dataProvider'.ucfirst($testableRepositoryMethod->title));
+//            $aiQuery = 'PHP Laravel. Write Tests and dataProviders for method below, connect dataProviders via annotations. Make dataProvider function static. '."\n"
+//                .'Mock Dependencies. Put result class into namespace: \\'
+//                .NamespaceAndPathGeneratorYaml::generateRepositoryTestNamespace($module->title)." Add to start of each test method line: \"throw new \Exception('You forget to check this test');\"\n\n";
+//            $aiQuery .= $fileHeader."\n";
+//            $aiQuery .= $methodsText[$testableRepositoryMethod->title]."\n\n";
+//            $aiQuery .='}'. "\n\n";
+//
+//            $aiResult = $this->queryAiForAnswer($aiQuery);
+//            preg_match_all('/use\s.*?;/s', $aiResult, $uses);
+//            foreach ($uses[0] as $use) {
+//                $use = str_replace('use ', '\\', $use);
+//                $use = str_replace(';', '', $use);
+//                $serviceTestNamespace->addUse($use);
+//            }
+//            preg_match('/{(.*)}/s', $aiResult, $body);
+//            $responseTestMethods[] = $body[1];
 
         }
 

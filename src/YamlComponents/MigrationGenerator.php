@@ -167,7 +167,7 @@ class MigrationGenerator extends AbstractGenerator
 
         $upMethod->addBody("\n".'});');
 
-        $downBody = 'Schema::dropIfExists(\''.$tableName.'\');';
+        $downBody = 'Schema::connection(\'pgsql-'.NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($module->title).'\')->dropIfExists(\''.$tableName.'\');';
         $downMethod->setBody($downBody);
 
 

@@ -26,6 +26,7 @@ class ModelGenerator extends AbstractGenerator
         $class = $this->fillModelRelations($class, $model, $modelRelations);
         $this->setTableName($class, $model);
         $this->setConnection($class, $model, $moduleTitle);
+        $this->setTimestams($class, $model, $moduleTitle);
         return $class;
     }
 
@@ -46,6 +47,16 @@ class ModelGenerator extends AbstractGenerator
         $class->addProperty('connection')
             ->setValue('pgsql-'.NamespaceAndPathGeneratorYaml::convertStringToSnakeCase($moduleTitle))
             ->setProtected();
+    }
+
+    private function setTimestams(ClassLike|ClassType $class, Model $model, string $moduleTitle)
+    {
+        if ($class->hasProperty('timestamps')) {
+            $class->removeProperty('timestamps');
+        }
+        $class->addProperty('timestamps')
+            ->setValue(false)
+            ->setPublic();
     }
 
     public function generate(Module $module)
@@ -183,4 +194,6 @@ class ModelGenerator extends AbstractGenerator
         }
         return $class;
     }
+
+
 }
