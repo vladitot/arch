@@ -178,7 +178,7 @@ abstract class AbstractGenerator
      */
     protected function queryAiForAnswer(string $question) {
         return "{\n //someBody \n}";
-        $client = OpenAI::client('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');
+        $client = OpenAI::client('');
 
         try {
             $result = $client->completions()->create([
