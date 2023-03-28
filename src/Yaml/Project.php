@@ -3,21 +3,17 @@
 namespace Vladitot\Architect\Yaml;
 
 use Spatie\LaravelData\Data;
-use Vladitot\Architect\Yaml\Laravel\InfraAnchor;
 
 class Project extends Data
 {
-    public string $title;
+    public string $title = 'change-me';
     /**
      * @var array|ModulePath[] $modulePaths;
      */
-    public array $modulePaths;
+    public array $modulePaths = [];
 
-    public string $infra_version;
+    public string $infra_version = 'v0.0.1';
 
     public ?string $image = 'put-image-here';
-
-    public string $base_domain;
-
 
 }
