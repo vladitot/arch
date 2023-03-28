@@ -19,7 +19,7 @@ class SchemaGenerate extends Command
      *
      * @var string
      */
-    protected $signature = 'architect:schema';
+    protected $signature = 'architect:schema {--once}';
 
     /**
      * The console command description.
@@ -102,6 +102,7 @@ class SchemaGenerate extends Command
                 }
             }
             echo 're-generated' . "\n";
+            if ($this->option('once')) break;
             sleep(1);
         }
 
